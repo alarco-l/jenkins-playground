@@ -1,0 +1,31 @@
+def SRC_FOLDER = "my-app"
+
+properties([
+    disableConcurrentBuilds(),
+    disableResume(),
+])
+
+podTemplate(inheritFrom: 'jnlp-pod', containers: [
+    containerTemplate(name: 'node', image: 'node:13.10-buster', ttyEnabled: true, command: 'cat'),
+  ]) {
+
+    node(POD_LABEL) {
+        ansiColor('xterm') {
+            stage('checkout') {
+                checkout scm
+            }
+
+            stage('npm test & build') {
+                container('node') {
+                    sh """
+                    cd $SRC_FOLDER
+
+                    npm ci
+                    npm run test
+                    npm run build
+                    """
+                }
+            }
+        }
+    }
+}
