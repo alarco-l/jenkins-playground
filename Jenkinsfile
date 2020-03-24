@@ -1,3 +1,7 @@
+def SLN_PATH = "web01/web01.csproj"
+def TEST_PATH = "test/test.csproj"
+def SRC_FOLDER = "web01"
+
 properties([
     disableConcurrentBuilds(),
     disableResume(),
@@ -6,6 +10,7 @@ properties([
 podTemplate(inheritFrom: 'jnlp-pod', containers: [
     containerTemplate(name: 'kaniko', image: 'gcr.io/kaniko-project/executor:debug', alwaysPullImage: false, ttyEnabled: true, command: '/busybox/cat'),
     containerTemplate(name: 'gitversions', image: 'gittools/gitversion', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'dotnet-sdk', image: 'mcr.microsoft.com/dotnet/core/sdk:3.1-alpine', ttyEnabled: true, command: 'cat'),
   ]) {
 
     node(POD_LABEL) {
@@ -22,6 +27,14 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                 }
             }
 
+            stage('Dotnet build & tests') {
+                container('dotnet-sdk') {
+                    sh """
+                    dotnet build $SLN_PATH
+                    """
+                }
+            }
+
             stage('Build Image') {
                 withCredentials([[$class: 'ZipFileBinding', credentialsId: 'config-json', variable: 'DOCKER_CONFIG']]) {
                     container('kaniko') {
@@ -32,7 +45,7 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                         SHA=\$(cat gitversion.properties | grep -w GitVersion_ShortSha | cut -d '=' -f2-)
                         TAG=\$(echo "\$MAJOR.\$MINOR.\$COMMIT-\$SHA")
 
-                        cd web01
+                        cd $SRC_FOLDER
                         /kaniko/executor --context dir://. --cache=false --insecure --skip-tls-verify --destination=azalaxdev/demos:web-demo\$TAG
                         """
                     }
