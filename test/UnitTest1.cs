@@ -8,7 +8,8 @@ namespace test
         [Fact]
         public void Test1()
         {
-
+            var ko = false;
+            Assert.False(ko);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace web01
                         Hostname = Dns.GetHostName(),
                     };
 
-                    context.Response.ContentType = "application/json; charset=utf-8";
+                    context.Response.ContentType = "application/json; charset=utf-8"
                     await JsonSerializer.SerializeAsync(context.Response.Body, backendInfo);
                 });
             });
