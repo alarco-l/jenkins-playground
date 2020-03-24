@@ -31,6 +31,7 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                 container('dotnet-sdk') {
                     sh """
                     dotnet build $SLN_PATH
+                    dotnet test $TEST_PATH
                     """
                 }
             }
