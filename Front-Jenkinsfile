@@ -7,6 +7,7 @@ properties([
 
 podTemplate(inheritFrom: 'jnlp-pod', containers: [
     containerTemplate(name: 'node', image: 'node:13.10-buster', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'az-cli', image: 'microsoft/azure-cli', ttyEnabled: true, command: 'cat')
   ]) {
 
     node(POD_LABEL) {
@@ -23,6 +24,14 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                     npm ci
                     npm run test
                     npm run build
+                    """
+                }
+            }
+
+            stage('push to cdn') {
+                container('az-cli') {
+                    sh """
+                    az version
                     """
                 }
             }
