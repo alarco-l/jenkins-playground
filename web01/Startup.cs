@@ -1,4 +1,6 @@
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +42,13 @@ namespace web01
                     context.Response.ContentType = "application/json; charset=utf-8";
                     await JsonSerializer.SerializeAsync(context.Response.Body, backendInfo);
                 });
+
+		endpoints.MapGet("/health", async context => {
+		    using var httpClient = new HttpClient();
+		    var result = await httpClient.GetAsync("http://web.default.svc.cluster.local:5000");
+		    Console.WriteLine((int)result.StatusCode);
+		    context.Response.StatusCode = (int)result.StatusCode;
+		});
             });
         }
     }
