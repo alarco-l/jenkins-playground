@@ -44,7 +44,13 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                         MINOR=\$(cat gitversion.properties | grep -w GitVersion_Minor | cut -d '=' -f2-)
                         COMMIT=\$(cat gitversion.properties | grep -w GitVersion_CommitsSinceVersionSource | cut -d '=' -f2-)
                         SHA=\$(cat gitversion.properties | grep -w GitVersion_ShortSha | cut -d '=' -f2-)
-                        TAG=\$(echo "\$MAJOR.\$MINOR.\$COMMIT-\$SHA")
+                        BRANCH=\$(cat gitversion.properties | grep -w GitVersion_BranchName | cut -d '=' -f2-)
+
+                        if [ "\$BRANCH" = "master" ]; then
+                          TAG=\$(echo "\$MAJOR.\$MINOR.\$COMMIT-\$SHA")
+                        else
+                          TAG=\$(echo "\$BRANC-\$MAJOR.\$MINOR.\$COMMIT-\$SHA")
+                        fi;
                         echo "web-demo-\$TAG" > tag.txt
 
                         cd $SRC_FOLDER
