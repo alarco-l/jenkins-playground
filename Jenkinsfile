@@ -45,11 +45,28 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                         COMMIT=\$(cat gitversion.properties | grep -w GitVersion_CommitsSinceVersionSource | cut -d '=' -f2-)
                         SHA=\$(cat gitversion.properties | grep -w GitVersion_ShortSha | cut -d '=' -f2-)
                         TAG=\$(echo "\$MAJOR.\$MINOR.\$COMMIT-\$SHA")
+                        echo "web-demo-\$TAG" > tag.txt
 
                         cd $SRC_FOLDER
                         /kaniko/executor --context dir://. --cache=false --insecure --skip-tls-verify --destination=azalaxdev/demos:web-demo-\$TAG
                         """
                     }
+                }
+            }
+
+            stage('Argocd') {
+                withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh """
+                    git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/alarco-l/argocd-playground.git
+                    cd argocd-playground
+                    git config --global user.email "agent@ci.fr"
+                    git config --global user.name "ci-agent"
+                    TAG=\$(cat ../tag.txt)
+                    ./tag.sh web-demo \$TAG
+                    git status
+                    git commit -m "update web-demo tag"
+                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/alarco-l/argocd-playground.git
+                    """
                 }
             }
         }
