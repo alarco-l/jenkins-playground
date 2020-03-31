@@ -47,7 +47,7 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                         TAG=\$(echo "\$MAJOR.\$MINOR.\$COMMIT-\$SHA")
 
                         cd $SRC_FOLDER
-                        /kaniko/executor --context dir://. --cache=false --insecure --skip-tls-verify --destination=azalaxdev/demos:web-demo\$TAG
+                        /kaniko/executor --context dir://. --cache=false --insecure --skip-tls-verify --destination=azalaxdev/demos:web-demo-\$TAG
                         """
                     }
                 }
