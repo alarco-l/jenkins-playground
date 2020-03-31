@@ -63,22 +63,6 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
                     }
                 }
             }
-
-            stage('Argocd') {
-                withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh """
-                    git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/alarco-l/argocd-playground.git
-                    cd argocd-playground
-                    git config --global user.email "agent@ci.fr"
-                    git config --global user.name "ci-agent"
-                    TAG=\$(cat ../tag.txt)
-                    ./tag.sh web-demo \$TAG
-                    git status
-                    git commit -m "update web-demo tag"
-                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/alarco-l/argocd-playground.git
-                    """
-                }
-            }
         }
     }
 }
