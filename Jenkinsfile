@@ -17,6 +17,10 @@ podTemplate(inheritFrom: 'jnlp-pod', containers: [
         ansiColor('xterm') {
             stage('checkout') {
                 checkout scm
+                sh """
+                git checkout -B master
+                git checkout -
+                """
             }
 
             stage('gitversions') {
